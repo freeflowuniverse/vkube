@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../publishtools"
+		},
+		{
+			"path": "../crystallib"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}
