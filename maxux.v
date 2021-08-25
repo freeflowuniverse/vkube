@@ -9,8 +9,7 @@ k.authorize(rootca, cert, key)
 k.api_info()
 k.pods_gets()
 
-x := crystalkube.template_redis("1.2.3")
-println(x)
-k.pod_create(x.encode())
-
+redis := crystalkube.template_redis("1.2.3")
+println(redis)
+k.pod_create(redis)
 

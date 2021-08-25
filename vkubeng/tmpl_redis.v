@@ -1,129 +1,34 @@
 module crystalkube
 
-import json
+pub fn template_redis(version string) Pod {
+	mut p := pod_new()
+	p.metadata("redis")
 
-struct Kube_Redis {
-	api_version string
-	kind string
-	metadata Kube_Redis_Metadata
-	spec Kube_Redis_Spec
-}
+	mut c := pod_container_new()
+	c.name("redis")
+	c.image("redis:$version")
+	c.command(["redis-server", "/redis-master/redis.conf"])
+	c.resources.limits.cpu("0.1")
+	c.envset("MASTER", "true")
 
-struct Kube_Redis_Metadata {
-	name string
-}
+	c.ports << pod_container_port(6379)
+	c.volume_mounts << pod_container_volume_mount("/redis-master", "config")
 
-struct Kube_Redis_Spec {
-	containers []Kube_Redis_Container
-	volumes []Kube_Redis_Volume
-}
+	p.container_add(c)
 
-struct Kube_Redis_Container {
-mut:
-	name string
-	image string
-	command []string
-	env []Kube_Name_Value
-	ports []Kube_Redis_Containers_Port
-	resources Kube_Redis_Containers_Resource
-	volume_mounts []Kube_Redis_Containers_VolumeMount
-}
+	mut v1 := pod_volume_new("data")
 
-struct Kube_Name_Value {
-	name string
-	value string
-}
-
-struct Kube_Redis_Containers_Port {
-	container_port int
-}
-
-struct Kube_Redis_Containers_Resource {
-	limits Kube_Redis_Containers_Resources_Limit
-}
-
-struct Kube_Redis_Containers_Resources_Limit {
-	cpu string
-}
-
-struct Kube_Redis_Containers_VolumeMount {
-	mount_path string
-	name string
-}
-
-struct Kube_Redis_Volume {
-	name string
-	empty_dir Kube_Redis_Volume_EmptyDir
-mut:
-	config_map Kube_Redis_Volume_ConfigMap
-}
-
-struct Kube_Redis_Volume_ConfigMap {
-	name string
-mut:
-	items []Kube_Redis_Volume_ConfigMap_Item
-}
-
-struct Kube_Redis_Volume_ConfigMap_Item {
-	key string
-	path string
-}
-
-struct Kube_Redis_Volume_EmptyDir {
-
-}
-
-pub fn template_redis(version string) Kube_Redis {
-	mut c := Kube_Redis_Container{
-		name: "redis",
-		image: "redis:$version",
-		command: ["redis-server", "/redis-master/redis.conf"],
-		resources: Kube_Redis_Containers_Resource{
-			limits: Kube_Redis_Containers_Resources_Limit{
-				cpu: "0.1",
-			}
-		}
+	mut v2 := pod_volume_new("config")
+	v2.config_map = Pod_Volume_ConfigMap{
+		name: "example-redis-config",
+		items: []Pod_Volume_ConfigMap_Item{}
 	}
 
-	c.env << Kube_Name_Value{name: "MASTER", value: "true"}
-	c.ports << Kube_Redis_Containers_Port{container_port: 6379}
-	c.volume_mounts << Kube_Redis_Containers_VolumeMount{mount_path: "/redis-master", name: "config"}
+	v2.config_map.items << Pod_Volume_ConfigMap_Item{key: "redis-config", path: "redis.conf"}
 
-	mut cs := []Kube_Redis_Container{}
-	cs << c
+	p.volume_add(v1)
+	p.volume_add(v2)
 
-	mut v1 := Kube_Redis_Volume{
-		name: "data",
-		empty_dir: Kube_Redis_Volume_EmptyDir{}
-	}
-
-	mut v2 := Kube_Redis_Volume{
-		name: "config",
-		config_map: Kube_Redis_Volume_ConfigMap{
-			name: "example-redis-config",
-			items: []Kube_Redis_Volume_ConfigMap_Item{}
-		}
-	}
-
-	v2.config_map.items << Kube_Redis_Volume_ConfigMap_Item{key: "redis-config", path: "redis.conf"}
-
-	mut vs := []Kube_Redis_Volume{}
-	vs << v1
-	vs << v2
-
-	return Kube_Redis{
-		api_version: "v1",
-		kind: "Pod",
-		metadata: Kube_Redis_Metadata{
-			name: "redis",
-		},
-		spec: Kube_Redis_Spec{
-			containers: cs,
-			volumes: vs,
-		},
-	}
+	return p
 }
 
-pub fn (k Kube_Redis) encode() string {
-	return json.encode(k)
-}

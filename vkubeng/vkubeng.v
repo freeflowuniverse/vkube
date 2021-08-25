@@ -61,6 +61,6 @@ pub fn (k Kube) pod_get() {
 
 }
 
-pub fn (k Kube) pod_create(object string) {
-	println(object)
+pub fn (k Kube) pod_create(object Pod) {
+	println(object.encode())
 }
