@@ -7,9 +7,17 @@ key := "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUV4c1YxMVJrVE10RC82
 mut k := crystalkube.kube_get("10.241.0.67", 6443, "/api")
 k.authenticate(rootca, cert, key)?
 k.api_info()
-println(k.pods_get("default")?)
 
-redis := crystalkube.template_redis("1.2.3")
+// pods := k.pod_get_all("default")?
+// println(pods)
+
+e := k.pod_get("default", "redis")?
+println(e)
+
+redis := crystalkube.template_redis("6.2.5")
 println(redis)
-println(k.pod_create(redis)?)
 
+// k.pod_delete("default", "redis")?
+
+s := k.pod_create("default", redis)?
+println(s)

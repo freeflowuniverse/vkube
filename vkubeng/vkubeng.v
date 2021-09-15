@@ -2,6 +2,7 @@ module crystalkube
 
 import net.http
 import encoding.base64
+import json
 
 struct Kube {
 mut:
@@ -83,6 +84,30 @@ fn (k Kube) post(url string, data string) ? string {
 	return r.text
 
 }
+
+fn (k Kube) delete(url string) ? string {
+	println("deleting $url")
+
+	vurl := "$k.url$url"
+
+	r := http.fetch(
+		validate: true
+		url: vurl,
+		verify: k.verify,
+		cert: k.cert,
+		cert_key: k.key,
+		in_memory_verification: true
+		method: .delete,
+
+	) or {
+		return error("could not delete request to k8s: $err")
+	}
+
+	return r.text
+
+}
+
+
 // public functions
 
 // rootca, cert and key should be base64 encoded
@@ -125,20 +150,39 @@ pub fn (k Kube) api_info() {
 	// k.request("/api")?
 }
 
-pub fn (k Kube) pods_get(namespace string) ? string {
+pub fn (k Kube) pod_get_all(namespace string) ? string {
 	println("fetching pods")
 
 	r := k.get("/v1/namespaces/$namespace/pods")?
 	return r
 }
 
-pub fn (k Kube) pod_get(namespace string, name string) {
+pub fn (k Kube) pod_get(namespace string, name string) ? string {
+	println("fetching pod $namespace/$name")
 
+	r := k.get("/v1/namespaces/$namespace/pods/$name")?
+	return r
 }
 
-pub fn (k Kube) pod_create(object Pod) ? string {
+pub fn (k Kube) pod_create(namespace string, object Pod) ? string {
 	j := object.encode()
 	println(j)
 
-	return k.post("/v1/namespaces/default/pods", j)
+	r := k.post("/v1/namespaces/$namespace/pods", j)?
+
+	status := json.decode(Status, r) or {
+		Status{kind: "NotStatus"}
+	}
+
+	if status.kind == "Status" {
+		println(status)
+		return error("could not create pod")
+	}
+
+	return r
+}
+
+pub fn (k Kube) pod_delete(namespace string, name string) ? {
+	r := k.delete("/v1/namespaces/$namespace/pods/$name")?
+	println(r)
 }
