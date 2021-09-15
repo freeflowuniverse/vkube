@@ -3,7 +3,7 @@ module crystalkube
 import json
 
 struct Pod {
-	api_version string
+	api_version string [json: apiVersion]
 	kind string
 mut:
 	metadata Pod_Metadata
@@ -29,7 +29,7 @@ mut:
 	env []Pod_Name_Value
 	ports []Pod_Containers_Port
 	resources Pod_Containers_Resource
-	volume_mounts []Pod_Containers_VolumeMount
+	volume_mounts []Pod_Containers_VolumeMount [json: volumeMounts]
 }
 
 struct Pod_Name_Value {
@@ -39,7 +39,7 @@ mut:
 }
 
 struct Pod_Containers_Port {
-	container_port int
+	container_port int [json: containerPort]
 }
 
 struct Pod_Containers_Resource {
@@ -53,15 +53,15 @@ mut:
 }
 
 struct Pod_Containers_VolumeMount {
-	mount_path string
+	mount_path string [json: mountPath]
 	name string
 }
 
 struct Pod_Volume {
 	name string
-	empty_dir Pod_Volume_EmptyDir
+	empty_dir Pod_Volume_EmptyDir [json: emptyDir]
 mut:
-	config_map Pod_Volume_ConfigMap
+	config_map Pod_Volume_ConfigMap [skip] // [json: configMap]
 }
 
 struct Pod_Volume_ConfigMap {
