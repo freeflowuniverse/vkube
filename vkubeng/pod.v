@@ -15,6 +15,8 @@ mut:
 	name string
 }
 
+type Pod_Volume = Pod_Volume_Type_EmptyDir | Pod_Volume_Type_ConfigMap
+
 struct Pod_Spec {
 mut:
 	containers []Pod_Container
@@ -57,11 +59,15 @@ struct Pod_Containers_VolumeMount {
 	name string
 }
 
-struct Pod_Volume {
+struct Pod_Volume_Type_EmptyDir {
 	name string
 	empty_dir Pod_Volume_EmptyDir [json: emptyDir]
+}
+
+struct Pod_Volume_Type_ConfigMap {
+	name string
 mut:
-	config_map Pod_Volume_ConfigMap [skip] // [json: configMap]
+	config_map Pod_Volume_ConfigMap [json: configMap]
 }
 
 struct Pod_Volume_ConfigMap {
@@ -153,8 +159,12 @@ pub fn pod_container_volume_mount(path string, name string) Pod_Containers_Volum
 	return Pod_Containers_VolumeMount{mount_path: path, name: name}
 }
 
-pub fn pod_volume_new(name string) Pod_Volume {
-	return Pod_Volume{name: name}
+pub fn pod_volume_emptydir_new(name string) Pod_Volume_Type_EmptyDir {
+	return Pod_Volume_Type_EmptyDir{name: name}
+}
+
+pub fn pod_volume_configmap_new(name string) Pod_Volume_Type_ConfigMap {
+	return Pod_Volume_Type_ConfigMap{name: name}
 }
 
 pub fn (p Pod) encode() string {

@@ -16,9 +16,9 @@ pub fn template_redis(version string) Pod {
 
 	p.container_add(c)
 
-	mut v1 := pod_volume_new("data")
+	mut v1 := pod_volume_emptydir_new("data")
 
-	mut v2 := pod_volume_new("config")
+	mut v2 := pod_volume_configmap_new("config")
 	v2.config_map = Pod_Volume_ConfigMap{
 		name: "example-redis-config",
 		items: []Pod_Volume_ConfigMap_Item{}
