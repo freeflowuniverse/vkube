@@ -13,7 +13,7 @@ enum KubeState {
 
 fn kube_load() ?Kube {
 	mut kube := Kube{}
-	kube.redis = redisclient.connect('127.0.0.1:6379') or { redisclient.Redis{} }
+	// kube.redis = redisclient.connect('127.0.0.1:6379') or { redisclient.Redis{} }
 	return kube
 }
 
