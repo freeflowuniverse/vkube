@@ -1,4 +1,4 @@
-module crystalkube
+module vkube
 
 import net.http
 import encoding.base64

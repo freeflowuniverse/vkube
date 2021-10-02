@@ -1,4 +1,4 @@
-module crystalkube
+module vkube
 
 [heap]
 pub struct Kube {
@@ -13,6 +13,7 @@ enum KubeState {
 
 fn kube_load() ?Kube {
 	mut kube := Kube{}
+	// kube.redis = redisclient.connect('127.0.0.1:6379') or { redisclient.Redis{} }
 	return kube
 }
 
@@ -24,5 +25,5 @@ const kubeobj = kube_load() or {
 }
 
 pub fn get() Kube {
-	return crystalkube.kubeobj
+	return vkube.kubeobj
 }

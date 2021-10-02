@@ -1,4 +1,4 @@
-import crystalkube
+import vkube
 
-mut g := crystalkube.get()
+mut g := vkube.get()
 println(g)

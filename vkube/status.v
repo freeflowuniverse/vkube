@@ -1,4 +1,4 @@
-module crystalkube
+module vkube
 
 struct Status {
 	api_version string [json: apiVersion]

@@ -1,4 +1,4 @@
-module crystalkube
+module vkube
 
 pub fn template_redis(version string) Pod {
 	mut p := pod_new()
